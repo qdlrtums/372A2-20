@@ -1,6 +1,6 @@
 import os, csv, time
-# from src.harness_gbn import run_once
-from src.harness_sw import run_once
+from src.harness_gbn import run_once
+# from src.harness_sw import run_once
 # from src.harness_sr import run_once
 
 SIZES = {
