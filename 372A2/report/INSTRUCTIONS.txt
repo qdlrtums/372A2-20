@@ -1,0 +1,355 @@
+Assignment.2 (Group) – Reliable Data Transfer over UDP
+CP372 – Computer Network, Spring 2026
+
+
+1. Overview
+In this assignment, you will implement and compare two fundamental reliable data transfer protocols:
+	•	Stop-and-Wait 
+	•	Go-Back-N (GBN)
+Both protocols will be implemented on top of UDP sockets in Python.
+Since UDP does not provide reliability, your implementation must add mechanisms such as:
+	•	Sequence numbers
+	•	Acknowledgments (ACKs)
+	•	Timeouts
+	•	Retransmissions
+The objective is to understand how transport protocols achieve reliability despite packet loss.
+
+2. Learning Objectives
+After completing this assignment, students should be able to:
+	•	Explain the limitations of UDP.
+	•	Implement reliable data transfer mechanisms.
+	•	Implement Stop-and-Wait.
+	•	Implement Go-Back-N.
+	•	Handle packet loss through retransmissions.
+	•	Compare protocol performance under different network conditions.
+	•	Analyze throughput and efficiency of pipelined transmission.
+
+3. System Requirements
+	•	Python 3.x
+	•	UDP sockets (socket library)
+	•	Standard Python libraries only
+No third-party networking frameworks are permitted.
+
+4. Project Structure & deliverables
+Students should implement:
+sender_stopwait.py
+receiver_stopwait.py
+
+sender_gbn.py
+receiver_gbn.py
+
+report.pdf
+
+5. Packet Format
+Design a packet structure that supports reliable data transmission. Suggested fields include:
+Field
+Description
+Sequence Number
+Packet identifier
+ACK Number
+Used for acknowledgments
+Type
+DATA, ACK, and some other user defined TYPEs for file, message, control code transfer 
+Payload
+Data bytes
+You may choose your own encoding format. The packet format must be elaborated in detail in the report.
+
+Part A: Stop-and-Wait Protocol (35 Marks)
+Requirements
+Implement Stop-and-Wait.
+Sender
+The sender must:
+	•	Read a text file,  or generate some random/constant content by the program.
+	•	notify the server a file is to be transferred over
+	•	Divide the file into packets.
+	•	Send one packet at a time.
+	•	Start a timer after transmission.
+	•	Wait for ACK.
+	•	Retransmit upon timeout.
+	•	Continue until all packets are acknowledged.
+	•	Send a packet to notify the completion of file transfer 
+
+Receiver
+The receiver must:
+	•	Receive packets.
+	•	Check sequence number, Send ACKs for in order packets
+	•	Check packet TYPE, create a file if the TYPE = “upload a file”, save file content if TYPE == DATA; close the file if the TYPE == “completion of file transfer”
+	•	Ignore duplicate packets or out order packets.
+
+
+Part B: Simulated Packet Loss (15 Marks)
+Modify the receiver so that packets are randomly dropped.
+Example:
+if random.random() < LOSS_RATE:
+    drop packet
+Test:
+0%
+10%
+20%
+30%
+packet loss rates.
+
+Demonstrate
+The sender should still successfully transfer the file through retransmissions.
+
+Part C: Go-Back-N Protocol (35 Marks)
+Implement Go-Back-N using a sliding window.
+
+Sender Requirements
+Maintain:
+base
+nextseqnum
+window_size
+Behavior:
+	•	Send multiple packets without waiting.
+	•	Start timer for oldest unacknowledged packet.
+	•	Process cumulative ACKs.
+	•	Retransmit window after timeout.
+
+Example
+Window Size = 4
+Send:
+0 1 2 3
+
+ACK0 ACK1 ACK2
+
+Send:
+4 5 6
+
+Receiver Requirements
+Receiver:
+	•	Accept only the expected packet.
+	•	Discard out-of-order packets.
+	•	Send cumulative ACKs.
+Example:
+Expected = 3
+
+Receive 4
+
+Discard 4
+Send ACK2
+
+Packet Loss Testing
+Repeat experiments using:
+0%
+10%
+20%
+30%
+loss rates.
+
+Part D: Performance Evaluation (15 Marks)
+Conduct experiments comparing:
+Stop-and-Wait
+versus
+Go-Back-N
+
+Metrics
+Measure:
+1. Average Total Transfer Time (5 tests per file size per loss rate) 
+seconds
+
+2. Average Throughput (5 tests per file size per loss rate)
+bytes/second
+
+3. average Number of Retransmissions (5 tests per file size per loss rate)
+count
+
+4. Protocol Efficiency
+Discuss:
+	•	Channel utilization
+	•	Effect of packet loss
+	•	Scalability
+
+6. Experimental Scenarios
+Use the following file sizes for testing:
+10KB, 50KB, 100KB, 500KB, 1MB, 5MB, 10MB, 50MB, 100MB
+Test each file size under the following loss conditions, 5 tests each:
+0% loss; 10% loss; 20% loss; 30% loss 
+
+
+7. Report Requirements
+Submit a report containing:
+
+Introduction
+Brief explanation of:
+
+	•	The goal of the assignment.
+	•	A brief introduction of the tech background including brief introductions of
+	•	UDP
+	•	general principle of reliability
+	•	the Stop-and-Wait protocol model
+	•	Go-Back-N protocol model 
+
+Design - Separate (sub)sections for each model
+For each model, describe:
+	•	Packet format
+	•	Timer design
+	•	ACK handling
+	•	Window implementation
+	•	A flow chart to show how packet loss are handled 
+
+Experimental Results
+Include tables:
+Table.1 Average Stop-and-Wait Transfer Time (average of at least 5 tests per file size per loss rate) 
+Loss Rate
+10K
+50K
+100K
+500K
+1M
+5M
+10M
+50M
+100M
+0%
+
+
+
+
+
+
+
+
+
+10%
+
+
+
+
+
+
+
+
+
+20%
+
+
+
+
+
+
+
+
+
+30%
+
+
+
+
+
+
+
+
+
+
+
+
+Table.2 Average GBN transfer Time (average of at least 5 tests per file size per loss rate)
+Loss Rate
+10K
+50K
+100K
+500K
+1M
+5M
+10M
+50M
+100M
+0%
+
+
+
+
+
+
+
+
+
+10%
+
+
+
+
+
+
+
+
+
+20%
+
+
+
+
+
+
+
+
+
+30%
+
+
+
+
+
+
+
+
+
+
+
+Graphics
+Use graphics to make visual comparison of the performance
+Analysis
+Discuss:
+	•	Is GBN always faster than Stop-and-Wait for all testing cases. If yes, explain Why GBN is faster than Stop-and-Wait. If not, explain what the reason could be.
+	•	Impact of increasing packet loss.
+	•	Trade-offs between simplicity and efficiency.
+	•	Situations where Stop-and-Wait may still be useful.
+
+Conclusion
+Summarize findings and suggest possible improvements to the overall throughput
+
+8. Bonus Tasks (+10 Marks)
+Choose one:
+Option A (10% extra)
+Replace GBN with Selective Repeat (but using only one timer).
+OR
+Option B (5% extra)
+Add packet corruption simulation:
+if random.random() < CORRUPTION_RATE:
+    corrupt packet
+define and use checksums for error detection.
+
+9. Marking Scheme
+Component
+Marks
+Stop-and-Wait Sender
+10
+Stop-and-Wait Receiver
+10
+Packet Loss Handling
+10
+Go-Back-N Sender
+15
+Go-Back-N Receiver
+15
+Experimental Evaluation
+15
+Report & presentation 
+20
+Code Quality
+5
+Total
+100
+
+Submission Instructions
+containing:
+sender_stopwait.py
+receiver_stopwait.py
+sender_gbn.py
+receiver_gbn.py
+report.pdf
+a video presentation of the major functionalities and a demo of execution. 
+Readme.txt - Include instructions for running your programs and any assumptions made during implementation. 
+Bonus.txt – describe the extra efforts for consideration of bonus marks
+

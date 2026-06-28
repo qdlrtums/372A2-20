@@ -20,11 +20,15 @@ def ssw(filename="input.txt", retrylimit = 20, payloadsize=1024, timeout=0.01, d
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(timeout)
 
+    retransmits = 0
     start = time.time()
     for i in range(last_seq + 1):
         retries = 0
+        first = True
         while True:
             sock.sendto(packets[i], dest)
+            if not first: retransmits += 1
+            first = False
             try:
                 data, _ = sock.recvfrom(65535)
                 _, ack, ptype, _, _ = lib.deserialize(data)
@@ -37,4 +41,4 @@ def ssw(filename="input.txt", retrylimit = 20, payloadsize=1024, timeout=0.01, d
     elapsed = time.time()- start
     print("done")
     sock.close()
-    return elapsed
+    return elapsed, retransmits

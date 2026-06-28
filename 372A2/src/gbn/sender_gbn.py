@@ -23,7 +23,8 @@ def sgbn(filename = "input.txt", payloadsize=1024, timeout=0.01, windowsize=4, d
     base = 0
     nextseqnum = 0
     timer_start = None
-    
+    retransmits = 0
+
     start = time.time()
     while base <= last_seq:
         while nextseqnum < base + windowsize and nextseqnum <= last_seq:
@@ -45,8 +46,9 @@ def sgbn(filename = "input.txt", payloadsize=1024, timeout=0.01, windowsize=4, d
             timer_start = time.time()
             for s in range(base, nextseqnum):
                 sock.sendto(packets[s], dest)
+                retransmits += 1
     elapsed = time.time() - start
 
     print("done")
     sock.close()
-    return elapsed
+    return elapsed, retransmits

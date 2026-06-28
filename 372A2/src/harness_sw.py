@@ -11,10 +11,10 @@ def run_once(path, loss, port=5000, payloadsize=8192, timeout=0.03, retrylimit=2
     t = threading.Thread(target=server.serve, daemon=True)
     t.start()
     time.sleep(0.2)
-    elapsed = ssw(filename=path, payloadsize=payloadsize, timeout=timeout, retrylimit=20, dest=("127.0.0.1", port))
+    elapsed, retransmits = ssw(filename=path, payloadsize=payloadsize, timeout=timeout, retrylimit=20, dest=("127.0.0.1", port))
     server.stop()
     t.join(timeout=1)
-    return elapsed
+    return elapsed, retransmits
 
 
 
